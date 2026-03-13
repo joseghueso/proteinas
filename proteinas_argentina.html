@@ -205,6 +205,8 @@ tbody td { padding:8px 10px; vertical-align:middle; }
     <div class="chart-wrap"><div class="chart-inner"><canvas id="chart1"></canvas></div></div>
     <p class="section-title">Menos de 20g de proteina <span id="count-low"></span></p>
     <div class="chart-wrap"><div class="chart-inner"><canvas id="chart2"></canvas></div></div>
+    <p class="section-title">Carbohidratos, verduras y grasas <span id="count-carbs"></span></p>
+    <div class="chart-wrap"><div class="chart-inner"><canvas id="chart3"></canvas></div></div>
   </div>
 
   <!-- TABLA -->
@@ -275,7 +277,25 @@ var builtinFoods = [
   {name:"Almendras",                   cat:"Semilla/Fruto seco", prot:21, cal:579, custom:false},
   {name:"Semillas de chia",            cat:"Semilla",            prot:17, cal:490, custom:false},
   {name:"Quinoa cocida",               cat:"Cereal",             prot:4,  cal:120, custom:false},
-  {name:"Proteina de suero (whey)",    cat:"Suplemento",         prot:80, cal:380, custom:false}
+  {name:"Proteina de suero (whey)",    cat:"Suplemento",         prot:80, cal:380, custom:false},
+  // Carbohidratos y verduras
+  {name:"Arroz blanco cocido",          cat:"Carbo/Cereal",        prot:3,  cal:130, custom:false},
+  {name:"Arroz yamani cocido",          cat:"Carbo/Cereal",        prot:3,  cal:124, custom:false},
+  {name:"Papa hervida s/piel",          cat:"Carbo/Verdura",       prot:2,  cal:80,  custom:false},
+  {name:"Papa al horno s/aceite",       cat:"Carbo/Verdura",       prot:2,  cal:100, custom:false},
+  {name:"Papas fritas (bastones)",      cat:"Carbo/Frito",         prot:3,  cal:280, custom:false},
+  {name:"Pure de zapallo",              cat:"Carbo/Verdura",       prot:1,  cal:45,  custom:false},
+  {name:"Tomate fresco",                cat:"Verdura",             prot:1,  cal:18,  custom:false},
+  {name:"Lechuga",                      cat:"Verdura",             prot:1,  cal:15,  custom:false},
+  {name:"Rucula",                       cat:"Verdura",             prot:3,  cal:25,  custom:false},
+  {name:"Aceite de oliva (100g)",       cat:"Grasa/Aceite",        prot:0,  cal:884, custom:false},
+  {name:"Aceite de oliva (cda te 5g)",  cat:"Grasa/Aceite",        prot:0,  cal:44,  custom:false},
+  {name:"Pan negro masa madre molde",   cat:"Pan/Carbo",           prot:8,  cal:248, custom:false},
+  {name:"Pan blanco de molde",          cat:"Pan/Carbo",           prot:8,  cal:265, custom:false},
+  {name:"Boniato hervido",              cat:"Carbo/Verdura",       prot:2,  cal:90,  custom:false},
+  {name:"Zanahoria cruda",              cat:"Verdura",             prot:1,  cal:41,  custom:false},
+  {name:"Pure de papas (leche+aceite)", cat:"Carbo/Verdura",       prot:2,  cal:120, custom:false},
+  {name:"Fideos cocidos",               cat:"Carbo/Cereal",        prot:5,  cal:158, custom:false}
 ];
 
 var STORAGE_KEY = 'proteinas_custom_foods';
@@ -460,7 +480,7 @@ function renderCalc(){
 
 // ---- GRAFICOS Y TABLAS ----
 var currentSort='prot';
-var chart1=null, chart2=null;
+var chart1=null, chart2=null, chart3=null;
 
 function makeChart(canvasId, foods){
   var canvas=document.getElementById(canvasId);
@@ -552,14 +572,19 @@ function sortBy(key){
   btns.forEach(function(b){b.className='sort-btn';});
   var idx=['prot','cal','cal_asc','ratio','name'].indexOf(key);
   if(idx>=0){ var cls=(key==='prot')?'ap':(key==='name')?'an':'ac'; btns[idx].className='sort-btn '+cls; }
-  var high=foods.filter(function(f){return f.prot>=20;});
-  var low=foods.filter(function(f){return f.prot<20;});
+  var carbCats = ['Carbo/Cereal','Carbo/Verdura','Carbo/Frito','Pan/Carbo','Verdura','Grasa/Aceite'];
+  var high  = foods.filter(function(f){ return f.prot>=20 && carbCats.indexOf(f.cat)===-1; });
+  var low   = foods.filter(function(f){ return f.prot<20  && carbCats.indexOf(f.cat)===-1; });
+  var carbs = foods.filter(function(f){ return carbCats.indexOf(f.cat)>=0; });
   document.getElementById('count-high').textContent='('+high.length+' alimentos)';
   document.getElementById('count-low').textContent='('+low.length+' alimentos)';
+  document.getElementById('count-carbs').textContent='('+carbs.length+' alimentos)';
   if(chart1) chart1.destroy();
   if(chart2) chart2.destroy();
+  if(chart3) chart3.destroy();
   chart1=makeChart('chart1',high);
   chart2=makeChart('chart2',low);
+  chart3=makeChart('chart3',carbs);
   // reset table sort arrows and render
   tableSortKey='prot'; tableSortDir=-1;
   document.getElementById('arr-prot').innerHTML='&#x25BC;';
