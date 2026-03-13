@@ -98,27 +98,31 @@ header p { margin-top:10px; color:var(--muted); font-size:0.75rem; letter-spacin
 .legend { display:flex; justify-content:center; gap:28px; margin-bottom:16px; flex-wrap:wrap; }
 .li { display:flex; align-items:center; gap:8px; font-size:0.75rem; text-transform:uppercase; letter-spacing:.5px; }
 .dot { width:12px; height:12px; border-radius:2px; }
-.section-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:#fff; margin:0 0 12px 4px; }
-.section-title span { font-size:0.75rem; font-weight:400; color:var(--muted); margin-left:8px; }
-.chart-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px 16px 20px; margin-bottom:24px; overflow-x:auto; }
-.chart-inner { height:400px; }
-.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:48px; }
-table { width:100%; border-collapse:collapse; font-size:0.8rem; }
-thead th { background:#1a1d28; padding:13px 14px; font-family:'Syne',sans-serif; font-size:0.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
+.section-title { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; color:#fff; margin:0 0 10px 2px; }
+.section-title span { font-size:0.72rem; font-weight:400; color:var(--muted); margin-left:6px; }
+.main-layout { display:flex; gap:20px; align-items:flex-start; }
+.charts-col { flex:1; min-width:0; }
+.table-col { width:340px; flex-shrink:0; position:sticky; top:20px; }
+.chart-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px 12px 16px; margin-bottom:20px; overflow-x:auto; }
+.chart-inner { height:360px; }
+.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; max-height:90vh; overflow-y:auto; }
+table { width:100%; border-collapse:collapse; font-size:0.83rem; }
+thead th { background:#1a1d28; padding:10px 10px; font-family:'Syne',sans-serif; font-size:0.68rem; letter-spacing:1px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; position:sticky; top:0; z-index:2; }
 thead th.r { text-align:right; }
+.th-sortable { cursor:pointer; user-select:none; transition:color 0.15s; }
+.th-sortable:hover { color:#fff; }
+.th-arrow { font-size:0.6rem; margin-left:3px; opacity:0.7; }
 tbody tr { border-bottom:1px solid var(--border); }
 tbody tr:last-child { border-bottom:none; }
 tbody tr:hover { background:#1c1f2e; }
-tbody td { padding:11px 14px; vertical-align:middle; }
-.rank { color:var(--muted); font-size:0.65rem; font-family:'Syne',sans-serif; }
-.fn { font-weight:500; color:#fff; font-size:0.82rem; }
-.fc { font-size:0.65rem; color:var(--muted); margin-top:2px; }
+tbody td { padding:8px 10px; vertical-align:middle; }
+.fn { font-weight:500; color:#fff; font-size:0.83rem; }
+.fc { font-size:0.63rem; color:var(--muted); margin-top:1px; }
 .nr { text-align:right; font-variant-numeric:tabular-nums; }
 .gv { color:var(--gc); font-weight:500; }
 .cv { color:var(--cc); font-weight:500; }
-.bb { background:#1e2230; border-radius:3px; height:5px; width:72px; display:inline-block; overflow:hidden; vertical-align:middle; margin-left:6px; }
-.bf { height:100%; border-radius:3px; }
 .custom-row td .fn { color:var(--accent); }
+@media (max-width:900px) { .main-layout { flex-direction:column; } .table-col { width:100%; position:static; } }
 
 .io-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
 .btn-export { background:transparent; color:var(--gc); font-family:'Syne',sans-serif; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; border:1px solid rgba(0,229,176,0.35); border-radius:8px; padding:9px 16px; cursor:pointer; transition:all 0.2s; }
@@ -194,13 +198,33 @@ tbody td { padding:11px 14px; vertical-align:middle; }
   <div class="li"><div class="dot" style="background:var(--accent)"></div>Alimento personalizado</div>
 </div>
 
-<p class="section-title">20g de proteina o mas <span id="count-high"></span></p>
-<div class="chart-wrap"><div class="chart-inner"><canvas id="chart1"></canvas></div></div>
-<div class="table-wrap"><table><thead><tr><th>#</th><th>Alimento</th><th class="r">Proteinas (g)</th><th class="r">Calorias (kcal)</th><th class="r">Ratio cal/prot</th></tr></thead><tbody id="tb1"></tbody></table></div>
+<div class="main-layout">
+  <!-- GRAFICOS -->
+  <div class="charts-col">
+    <p class="section-title">20g de proteina o mas <span id="count-high"></span></p>
+    <div class="chart-wrap"><div class="chart-inner"><canvas id="chart1"></canvas></div></div>
+    <p class="section-title">Menos de 20g de proteina <span id="count-low"></span></p>
+    <div class="chart-wrap"><div class="chart-inner"><canvas id="chart2"></canvas></div></div>
+  </div>
 
-<p class="section-title">Menos de 20g de proteina <span id="count-low"></span></p>
-<div class="chart-wrap"><div class="chart-inner"><canvas id="chart2"></canvas></div></div>
-<div class="table-wrap"><table><thead><tr><th>#</th><th>Alimento</th><th class="r">Proteinas (g)</th><th class="r">Calorias (kcal)</th><th class="r">Ratio cal/prot</th></tr></thead><tbody id="tb2"></tbody></table></div>
+  <!-- TABLA -->
+  <div class="table-col">
+    <p class="section-title">Todos los alimentos</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="th-sortable" id="th-name" onclick="tableSort('name')">#&nbsp;Alimento <span class="th-arrow" id="arr-name"></span></th>
+            <th class="th-sortable r" id="th-prot" onclick="tableSort('prot')">Prot <span class="th-arrow" id="arr-prot">&#x25BC;</span></th>
+            <th class="th-sortable r" id="th-cal" onclick="tableSort('cal')">Cal <span class="th-arrow" id="arr-cal"></span></th>
+            <th class="th-sortable r" id="th-ratio" onclick="tableSort('ratio')">Ratio <span class="th-arrow" id="arr-ratio"></span></th>
+          </tr>
+        </thead>
+        <tbody id="tb-main"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
@@ -469,21 +493,51 @@ function makeChart(canvasId, foods){
   });
 }
 
-function makeTable(tbodyId,foods){
-  var maxP=Math.max.apply(null,foods.map(function(f){return f.prot;}));
-  var maxC=Math.max.apply(null,foods.map(function(f){return f.cal;}));
-  var tbody=document.getElementById(tbodyId); tbody.innerHTML='';
-  foods.forEach(function(f,i){
-    var pw=Math.round((f.prot/maxP)*72),cw=Math.round((f.cal/maxC)*72);
-    var tr=document.createElement('tr');
-    if(f.custom) tr.className='custom-row';
-    tr.innerHTML='<td class="rank">'+String(i+1).padStart(2,'0')+'</td>'+
-      '<td><div class="fn">'+f.name+(f.custom?' <span style="font-size:0.6rem;color:var(--accent);margin-left:4px">&#x2605; mio</span>':'')+'</div><div class="fc">'+f.cat+'</div></td>'+
-      '<td class="nr gv">'+f.prot+'g <span class="bb"><span class="bf" style="width:'+pw+'px;background:'+(f.custom?'var(--accent)':'var(--gc)')+'"></span></span></td>'+
-      '<td class="nr cv">'+f.cal+' <span class="bb"><span class="bf" style="width:'+cw+'px;background:var(--cc)"></span></span></td>'+
+var tableSortKey = 'prot';
+var tableSortDir = -1; // -1 = desc, 1 = asc
+
+function renderMainTable(foods) {
+  var tbody = document.getElementById('tb-main');
+  tbody.innerHTML = '';
+  foods.forEach(function(f, i) {
+    var tr = document.createElement('tr');
+    if(f.custom) tr.className = 'custom-row';
+    tr.innerHTML =
+      '<td><div class="fn">'+String(i+1)+'. '+f.name+(f.custom?' <span style="font-size:0.58rem;color:var(--accent)">&#x2605;</span>':'')+'</div><div class="fc">'+f.cat+'</div></td>'+
+      '<td class="nr gv">'+f.prot+'g</td>'+
+      '<td class="nr cv">'+f.cal+'</td>'+
       '<td class="nr" style="color:var(--muted)">'+(f.cal/f.prot).toFixed(1)+'</td>';
     tbody.appendChild(tr);
   });
+}
+
+function tableSort(key) {
+  if(tableSortKey === key) { tableSortDir *= -1; }
+  else { tableSortKey = key; tableSortDir = (key==='name') ? 1 : -1; }
+  // clear arrows
+  ['name','prot','cal','ratio'].forEach(function(k){
+    var el = document.getElementById('arr-'+k);
+    if(el) el.innerHTML = '';
+  });
+  var arr = document.getElementById('arr-'+key);
+  if(arr) arr.innerHTML = tableSortDir===-1 ? '&#x25BC;' : '&#x25B2;';
+  var foods = getAllFoods().slice();
+  // apply current chart sort first
+  if(currentSort==='prot')    foods.sort(function(a,b){return b.prot-a.prot;});
+  if(currentSort==='cal')     foods.sort(function(a,b){return b.cal-a.cal;});
+  if(currentSort==='cal_asc') foods.sort(function(a,b){return a.cal-b.cal;});
+  if(currentSort==='ratio')   foods.sort(function(a,b){return (a.cal/a.prot)-(b.cal/b.prot);});
+  if(currentSort==='name')    foods.sort(function(a,b){return a.name.localeCompare(b.name);});
+  // then apply table sort
+  foods.sort(function(a,b){
+    var va, vb;
+    if(key==='name')  { va=a.name; vb=b.name; return tableSortDir * va.localeCompare(vb); }
+    if(key==='prot')  { va=a.prot; vb=b.prot; }
+    if(key==='cal')   { va=a.cal;  vb=b.cal; }
+    if(key==='ratio') { va=a.cal/a.prot; vb=b.cal/b.prot; }
+    return tableSortDir * (vb - va);
+  });
+  renderMainTable(foods);
 }
 
 function sortBy(key){
@@ -506,8 +560,11 @@ function sortBy(key){
   if(chart2) chart2.destroy();
   chart1=makeChart('chart1',high);
   chart2=makeChart('chart2',low);
-  makeTable('tb1',high);
-  makeTable('tb2',low);
+  // reset table sort arrows and render
+  tableSortKey='prot'; tableSortDir=-1;
+  document.getElementById('arr-prot').innerHTML='&#x25BC;';
+  ['name','cal','ratio'].forEach(function(k){ var el=document.getElementById('arr-'+k); if(el) el.innerHTML=''; });
+  renderMainTable(foods);
 }
 
 
