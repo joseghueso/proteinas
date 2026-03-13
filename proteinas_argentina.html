@@ -6,179 +6,562 @@
 <title>Proteinas y Calorias - Alimentos Argentina</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400;500&display=swap');
-:root {
-  --bg:#0d0f14; --surface:#151820; --border:#1e2230;
-  --gc:#00e5b0; --cc:#ff6b35; --text:#e8eaf0; --muted:#6b7280;
-}
+:root { --bg:#0d0f14; --surface:#151820; --border:#1e2230; --gc:#00e5b0; --cc:#ff6b35; --text:#e8eaf0; --muted:#6b7280; --accent:#7c6fff; }
 * { box-sizing:border-box; margin:0; padding:0; }
 body { background:var(--bg); color:var(--text); font-family:'DM Mono',monospace; padding:36px 20px; }
-header { text-align:center; margin-bottom:30px; }
+header { text-align:center; margin-bottom:28px; }
 header h1 { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(1.6rem,3.5vw,2.6rem); color:#fff; line-height:1.2; }
-header h1 .g { color:var(--gc); } header h1 .c { color:var(--cc); }
+header h1 .g { color:var(--gc); }
 header p { margin-top:10px; color:var(--muted); font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; }
-.legend { display:flex; justify-content:center; gap:28px; margin-bottom:20px; flex-wrap:wrap; }
-.li { display:flex; align-items:center; gap:8px; font-size:0.72rem; text-transform:uppercase; letter-spacing:.5px; }
+
+/* PANEL AGREGAR ALIMENTO */
+.panel { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:28px; }
+.panel-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:#fff; margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+.panel-title .badge-custom { font-size:0.6rem; background:rgba(124,111,255,0.2); color:var(--accent); border:1px solid rgba(124,111,255,0.3); padding:3px 8px; border-radius:4px; letter-spacing:1px; text-transform:uppercase; }
+.panel-title .badge-builtin { font-size:0.6rem; background:rgba(0,229,176,0.15); color:var(--gc); border:1px solid rgba(0,229,176,0.2); padding:3px 8px; border-radius:4px; letter-spacing:1px; text-transform:uppercase; }
+.add-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:12px; }
+.af { display:flex; flex-direction:column; gap:5px; }
+.af label { font-size:0.65rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
+.af input, .af select {
+  background:#0d0f14; border:1px solid var(--border); border-radius:8px;
+  color:#fff; font-family:'DM Mono',monospace; font-size:0.85rem;
+  padding:9px 12px; outline:none; transition:border-color 0.2s;
+}
+.af input:focus, .af select:focus { border-color:var(--accent); }
+.af.name-f { flex:2; min-width:180px; }
+.af.cat-f  { flex:1; min-width:140px; }
+.af.num-f  { width:100px; }
+.btn-save { background:var(--accent); color:#fff; font-family:'Syne',sans-serif; font-weight:700; font-size:0.78rem; letter-spacing:1px; text-transform:uppercase; border:none; border-radius:8px; padding:10px 20px; cursor:pointer; transition:opacity 0.2s; white-space:nowrap; }
+.btn-save:hover { opacity:0.85; }
+.btn-cancel { background:transparent; color:var(--muted); font-family:'Syne',sans-serif; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; border:1px solid var(--border); border-radius:8px; padding:10px 16px; cursor:pointer; transition:all 0.2s; }
+.btn-cancel:hover { border-color:#ff4444; color:#ff4444; }
+
+/* Lista alimentos custom */
+.custom-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+.custom-tag {
+  background:#1a1d28; border:1px solid rgba(124,111,255,0.3); border-radius:8px;
+  padding:7px 12px; font-size:0.75rem; display:flex; align-items:center; gap:8px;
+}
+.custom-tag .tag-name { color:#fff; font-weight:500; }
+.custom-tag .tag-meta { color:var(--muted); font-size:0.65rem; }
+.custom-tag .tag-edit { background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.7rem; padding:0; }
+.custom-tag .tag-del  { background:none; border:none; color:#444; cursor:pointer; font-size:0.85rem; padding:0; }
+.custom-tag .tag-del:hover { color:#ff4444; }
+.no-custom { color:var(--muted); font-size:0.78rem; font-style:italic; }
+
+/* CALCULADORA */
+.calc-section { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px 24px; margin-bottom:40px; }
+.calc-title { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:20px; }
+.calc-title span { color:var(--gc); }
+.calc-row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin-bottom:12px; }
+.calc-field { display:flex; flex-direction:column; gap:6px; flex:1; min-width:180px; position:relative; }
+.calc-field label { font-size:0.68rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); }
+.calc-field input { background:#0d0f14; border:1px solid var(--border); border-radius:8px; color:#fff; font-family:'DM Mono',monospace; font-size:0.9rem; padding:10px 14px; outline:none; transition:border-color 0.2s; width:100%; }
+.calc-field input:focus { border-color:var(--gc); }
+.calc-field.small { max-width:120px; flex:none; }
+.autocomplete-list { position:absolute; top:100%; left:0; right:0; background:#1a1d28; border:1px solid var(--border); border-radius:8px; max-height:240px; overflow-y:auto; z-index:100; display:none; margin-top:4px; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
+.autocomplete-list.open { display:block; }
+.ac-item { padding:10px 14px; font-size:0.82rem; cursor:pointer; border-bottom:1px solid #1e2230; display:flex; justify-content:space-between; align-items:center; }
+.ac-item:last-child { border-bottom:none; }
+.ac-item:hover, .ac-item.selected { background:#252a3a; }
+.ac-item:hover .ac-name, .ac-item.selected .ac-name { color:var(--gc); }
+.ac-name { color:#fff; }
+.ac-meta { color:var(--muted); font-size:0.68rem; }
+.ac-custom-dot { width:6px; height:6px; background:var(--accent); border-radius:50%; margin-left:6px; display:inline-block; }
+.btn-add { background:var(--gc); color:#000; font-family:'Syne',sans-serif; font-weight:700; font-size:0.8rem; letter-spacing:1px; text-transform:uppercase; border:none; border-radius:8px; padding:11px 22px; cursor:pointer; transition:opacity 0.2s; white-space:nowrap; }
+.btn-add:hover { opacity:0.85; }
+.btn-clear { background:transparent; color:var(--muted); font-family:'Syne',sans-serif; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; border:1px solid var(--border); border-radius:8px; padding:11px 18px; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+.btn-clear:hover { border-color:#ff4444; color:#ff4444; }
+.items-list { margin-top:16px; }
+.item-row { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#0d0f14; border-radius:8px; margin-bottom:6px; gap:12px; flex-wrap:wrap; }
+.item-name { font-size:0.82rem; color:#fff; flex:1; min-width:150px; }
+.item-name small { color:var(--muted); font-size:0.68rem; display:block; margin-top:2px; }
+.item-macros { display:flex; gap:16px; align-items:center; }
+.item-prot { color:var(--gc); font-size:0.82rem; font-weight:500; }
+.item-cal  { color:var(--cc); font-size:0.82rem; font-weight:500; }
+.item-delete { background:none; border:none; color:#444; cursor:pointer; font-size:1rem; padding:4px 8px; border-radius:4px; }
+.item-delete:hover { color:#ff4444; background:rgba(255,68,68,0.1); }
+.totals-bar { display:flex; gap:24px; align-items:center; flex-wrap:wrap; background:#1a1d28; border-radius:10px; padding:16px 20px; margin-top:12px; border:1px solid var(--border); }
+.totals-label { font-family:'Syne',sans-serif; font-size:0.7rem; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
+.totals-val { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:700; }
+.totals-prot .totals-val { color:var(--gc); }
+.totals-cal  .totals-val { color:var(--cc); }
+.totals-ratio .totals-val { color:#fff; font-size:1rem; }
+
+/* SORT & CHARTS */
+.sort-bar { display:flex; justify-content:center; gap:10px; margin-bottom:28px; flex-wrap:wrap; }
+.sort-btn { font-family:'Syne',sans-serif; font-size:0.72rem; letter-spacing:1px; text-transform:uppercase; padding:8px 18px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--muted); cursor:pointer; transition:all 0.2s; }
+.sort-btn:hover { border-color:#444; color:#fff; }
+.sort-btn.ap { background:rgba(0,229,176,0.12); border-color:var(--gc); color:var(--gc); }
+.sort-btn.ac { background:rgba(255,107,53,0.12); border-color:var(--cc); color:var(--cc); }
+.sort-btn.an { background:rgba(255,255,255,0.07); border-color:#888; color:#fff; }
+.legend { display:flex; justify-content:center; gap:28px; margin-bottom:16px; flex-wrap:wrap; }
+.li { display:flex; align-items:center; gap:8px; font-size:0.75rem; text-transform:uppercase; letter-spacing:.5px; }
 .dot { width:12px; height:12px; border-radius:2px; }
-.chart-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:28px 12px 20px; margin-bottom:40px; overflow-x:auto; }
-#cc { position:relative; min-width:1100px; height:460px; }
-.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
-table { width:100%; border-collapse:collapse; font-size:0.74rem; }
-thead th { background:#1a1d28; padding:13px 14px; font-family:'Syne',sans-serif; font-size:0.67rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
+.section-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:#fff; margin:0 0 12px 4px; }
+.section-title span { font-size:0.75rem; font-weight:400; color:var(--muted); margin-left:8px; }
+.chart-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px 16px 20px; margin-bottom:24px; overflow-x:auto; }
+.chart-inner { height:400px; }
+.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; margin-bottom:48px; }
+table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+thead th { background:#1a1d28; padding:13px 14px; font-family:'Syne',sans-serif; font-size:0.7rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
 thead th.r { text-align:right; }
 tbody tr { border-bottom:1px solid var(--border); }
 tbody tr:last-child { border-bottom:none; }
 tbody tr:hover { background:#1c1f2e; }
-tbody td { padding:10px 14px; vertical-align:middle; }
-.rank { color:var(--muted); font-size:0.63rem; font-family:'Syne',sans-serif; }
-.fn { font-weight:500; color:#fff; font-size:0.78rem; }
-.fc { font-size:0.63rem; color:var(--muted); margin-top:2px; }
+tbody td { padding:11px 14px; vertical-align:middle; }
+.rank { color:var(--muted); font-size:0.65rem; font-family:'Syne',sans-serif; }
+.fn { font-weight:500; color:#fff; font-size:0.82rem; }
+.fc { font-size:0.65rem; color:var(--muted); margin-top:2px; }
 .nr { text-align:right; font-variant-numeric:tabular-nums; }
 .gv { color:var(--gc); font-weight:500; }
 .cv { color:var(--cc); font-weight:500; }
 .bb { background:#1e2230; border-radius:3px; height:5px; width:72px; display:inline-block; overflow:hidden; vertical-align:middle; margin-left:6px; }
 .bf { height:100%; border-radius:3px; }
+.custom-row td .fn { color:var(--accent); }
+
+.io-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:16px; padding-top:16px; border-top:1px solid var(--border); }
+.btn-export { background:transparent; color:var(--gc); font-family:'Syne',sans-serif; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; border:1px solid rgba(0,229,176,0.35); border-radius:8px; padding:9px 16px; cursor:pointer; transition:all 0.2s; }
+.btn-export:hover { background:rgba(0,229,176,0.08); }
+.btn-import { background:transparent; color:var(--accent); font-family:'Syne',sans-serif; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; border:1px solid rgba(124,111,255,0.35); border-radius:8px; padding:9px 16px; cursor:pointer; transition:all 0.2s; }
+.btn-import:hover { background:rgba(124,111,255,0.08); }
 </style>
 </head>
 <body>
+
 <header>
-  <h1>Alimentos ricos en <span class="g">Proteinas</span> — Argentina</h1>
-  <p>Proteinas (g) y Calorias (kcal) cada 100 gramos · ordenado de mayor a menor proteina</p>
+  <h1>Alimentos ricos en <span class="g">Proteinas</span> &mdash; Argentina</h1>
+  <p>Proteinas (g) y Calorias (kcal) cada 100 gramos</p>
 </header>
+
+<!-- PANEL MIS ALIMENTOS -->
+<div class="panel">
+  <div class="panel-title">
+    + Mis alimentos personalizados
+    <span class="badge-custom">se guardan en este navegador</span>
+  </div>
+  <div class="add-row">
+    <div class="af name-f"><label>Nombre del alimento</label><input type="text" id="new-name" placeholder="ej: Yogur Ser proteico"></div>
+    <div class="af cat-f"><label>Categoria</label><input type="text" id="new-cat" placeholder="ej: Lacteo"></div>
+    <div class="af num-f"><label>Proteinas (g/100g)</label><input type="number" id="new-prot" placeholder="ej: 14" min="0" max="100" step="0.1"></div>
+    <div class="af num-f"><label>Calorias (kcal/100g)</label><input type="number" id="new-cal" placeholder="ej: 85" min="0" max="9999" step="1"></div>
+    <button class="btn-save" id="btn-save-food" onclick="saveCustomFood()">Guardar</button>
+    <button class="btn-cancel" id="btn-cancel-edit" style="display:none" onclick="cancelEdit()">Cancelar</button>
+  </div>
+  <div id="custom-food-list" class="custom-list"></div>
+  <div class="io-bar">
+    <button class="btn-export" onclick="exportFoods()">&#x2B07; Exportar mis alimentos (.json)</button>
+    <label class="btn-import">&#x2B06; Importar alimentos (.json)<input type="file" accept=".json" onchange="importFoods(event)" style="display:none"></label>
+    <span id="import-msg" style="font-size:0.72rem;color:var(--gc);display:none"></span>
+  </div>
+</div>
+
+<!-- CALCULADORA -->
+<div class="calc-section">
+  <div class="calc-title"><span>&#x1F9EE;</span> Calculadora de comida</div>
+  <div class="calc-row">
+    <div class="calc-field" style="flex:2;min-width:220px;">
+      <label>Alimento</label>
+      <input type="text" id="calc-input" placeholder="Escribi para buscar..." autocomplete="off">
+      <div class="autocomplete-list" id="ac-list"></div>
+    </div>
+    <div class="calc-field small">
+      <label>Gramos</label>
+      <input type="number" id="calc-grams" placeholder="ej: 150" min="1">
+    </div>
+    <button class="btn-add" onclick="addCalcItem()">+ Agregar</button>
+    <button class="btn-clear" onclick="clearCalc()">Limpiar todo</button>
+  </div>
+  <div class="items-list" id="items-list"></div>
+  <div class="totals-bar" id="totals-bar" style="display:none">
+    <div class="totals-prot"><div class="totals-label">Total Proteinas</div><div class="totals-val" id="total-prot">0g</div></div>
+    <div class="totals-cal"><div class="totals-label">Total Calorias</div><div class="totals-val" id="total-cal">0 kcal</div></div>
+    <div class="totals-ratio"><div class="totals-label">Items</div><div class="totals-val" id="total-items">0</div></div>
+  </div>
+</div>
+
+<!-- SORT -->
+<div class="sort-bar">
+  <button class="sort-btn ap" onclick="sortBy('prot')">&#x25BC; Mayor proteina</button>
+  <button class="sort-btn" onclick="sortBy('cal')">&#x25BC; Mayor calorias</button>
+  <button class="sort-btn" onclick="sortBy('cal_asc')">&#x25B2; Menor calorias</button>
+  <button class="sort-btn" onclick="sortBy('ratio')">&#x25B2; Mejor ratio</button>
+  <button class="sort-btn" onclick="sortBy('name')">A-Z Nombre</button>
+</div>
 <div class="legend">
   <div class="li"><div class="dot" style="background:var(--gc)"></div>Proteinas g/100g (eje izq.)</div>
   <div class="li"><div class="dot" style="background:var(--cc)"></div>Calorias kcal/100g (eje der.)</div>
+  <div class="li"><div class="dot" style="background:var(--accent)"></div>Alimento personalizado</div>
 </div>
-<div class="chart-wrap"><div id="cc"><canvas id="myChart"></canvas></div></div>
-<div class="table-wrap"><table><thead><tr>
-  <th>#</th><th>Alimento</th><th class="r">Proteinas (g)</th><th class="r">Calorias (kcal)</th><th class="r">Ratio cal/prot</th>
-</tr></thead><tbody id="tb"></tbody></table></div>
+
+<p class="section-title">20g de proteina o mas <span id="count-high"></span></p>
+<div class="chart-wrap"><div class="chart-inner"><canvas id="chart1"></canvas></div></div>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Alimento</th><th class="r">Proteinas (g)</th><th class="r">Calorias (kcal)</th><th class="r">Ratio cal/prot</th></tr></thead><tbody id="tb1"></tbody></table></div>
+
+<p class="section-title">Menos de 20g de proteina <span id="count-low"></span></p>
+<div class="chart-wrap"><div class="chart-inner"><canvas id="chart2"></canvas></div></div>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Alimento</th><th class="r">Proteinas (g)</th><th class="r">Calorias (kcal)</th><th class="r">Ratio cal/prot</th></tr></thead><tbody id="tb2"></tbody></table></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
-var foods = [
-  // Carnes vacunas
-  {name:"Bife de lomo (vaca)",          cat:"Carne vacuna",       prot:21, cal:148},
-  {name:"Bife de cuadril (magro)",      cat:"Carne vacuna",       prot:21, cal:158},
-  {name:"Bife de chorizo (vaca)",       cat:"Carne vacuna",       prot:24, cal:215},
-  {name:"Carne vacuna magra",           cat:"Carne vacuna",       prot:26, cal:215},
-  {name:"Asado de tira",                cat:"Carne vacuna",       prot:20, cal:320},
-  {name:"Higado vacuno",                cat:"Carne vacuna",       prot:26, cal:135},
-  // Carnes de cerdo
-  {name:"Bife de chorizo cerdo",        cat:"Carne de cerdo",     prot:22, cal:180},
-  {name:"Carne de cerdo magra",         cat:"Carne de cerdo",     prot:27, cal:242},
-  // Aves
-  {name:"Pollo pechuga s/piel",         cat:"Ave",                prot:31, cal:165},
-  {name:"Pata muslo pollo s/piel",      cat:"Ave",                prot:20, cal:127},
-  {name:"Pavo pechuga",                 cat:"Ave",                prot:29, cal:135},
-  // Pescados y mariscos
-  {name:"Atun en lata al natural",      cat:"Pescado",            prot:30, cal:116},
-  {name:"Salmon",                       cat:"Pescado",            prot:25, cal:208},
-  {name:"Merluza",                      cat:"Pescado",            prot:17, cal:82},
-  {name:"Surubi / Dorado",              cat:"Pescado",            prot:20, cal:105},
-  {name:"Langostinos crudos",           cat:"Marisco",            prot:24, cal:99},
-  {name:"Pulpo cocido",                 cat:"Marisco",            prot:30, cal:164},
-  {name:"Calamar crudo",                cat:"Marisco",            prot:18, cal:92},
-  // Huevos
-  {name:"Huevo entero",                 cat:"Huevo",              prot:13, cal:143},
-  {name:"Clara de huevo",               cat:"Huevo",              prot:11, cal:52},
-  {name:"Yema de huevo",                cat:"Huevo",              prot:16, cal:322},
-  // Lacteos y quesos
-  {name:"Queso parmesano",              cat:"Queso duro",         prot:36, cal:392},
-  {name:"Queso danbo (Tybi)",           cat:"Queso semiduro",     prot:23, cal:350},
-  {name:"Queso mozzarella",             cat:"Queso fresco",       prot:22, cal:280},
-  {name:"Q. cremoso / port salut",      cat:"Queso semiduro",     prot:22, cal:300},
-  {name:"Q. port salut La Serenisima",  cat:"Queso semiduro",     prot:22, cal:300},
-  {name:"Queso Finlandia clasico",      cat:"Queso untable",      prot:18, cal:287},
-  {name:"Queso Finlandia light",        cat:"Queso untable",      prot:9,  cal:193},
-  {name:"Casancrem clasico",            cat:"Queso crema",        prot:7,  cal:227},
-  {name:"Casancrem light",              cat:"Queso crema",        prot:5,  cal:150},
-  {name:"Ricota",                       cat:"Queso fresco",       prot:11, cal:140},
-  {name:"Yogur griego natural",         cat:"Lacteo",             prot:10, cal:97},
-  {name:"Leche entera",                 cat:"Lacteo",             prot:3,  cal:61},
-  // Fiambres
-  {name:"Jamon cocido",                 cat:"Fiambre",            prot:18, cal:107},
-  {name:"Salame",                       cat:"Fiambre",            prot:22, cal:425},
-  {name:"Mortadela",                    cat:"Fiambre",            prot:13, cal:311},
-  // Legumbres
-  {name:"Soja texturizada seca",        cat:"Legumbre",           prot:52, cal:336},
-  {name:"Edamame (soja verde)",         cat:"Legumbre",           prot:11, cal:121},
-  {name:"Lentejas cocidas",             cat:"Legumbre",           prot:9,  cal:116},
-  {name:"Garbanzos cocidos",            cat:"Legumbre",           prot:9,  cal:164},
-  {name:"Porotos negros cocidos",       cat:"Legumbre",           prot:9,  cal:132},
-  // Semillas y frutos secos
-  {name:"Semillas de canamo",           cat:"Semilla",            prot:32, cal:553},
-  {name:"Mani tostado",                 cat:"Semilla/Fruto seco", prot:26, cal:585},
-  {name:"Almendras",                    cat:"Semilla/Fruto seco", prot:21, cal:579},
-  {name:"Semillas de chia",             cat:"Semilla",            prot:17, cal:490},
-  // Otros
-  {name:"Quinoa cocida",                cat:"Cereal",             prot:4,  cal:120},
-  {name:"Proteina de suero (whey)",     cat:"Suplemento",         prot:80, cal:380},
+// ---- BASE DE DATOS ----
+var builtinFoods = [
+  {name:"Bife de lomo (vaca)",         cat:"Carne vacuna",       prot:21, cal:148, custom:false},
+  {name:"Bife de cuadril (magro)",     cat:"Carne vacuna",       prot:21, cal:158, custom:false},
+  {name:"Bife de chorizo (vaca)",      cat:"Carne vacuna",       prot:24, cal:215, custom:false},
+  {name:"Carne vacuna magra",          cat:"Carne vacuna",       prot:26, cal:215, custom:false},
+  {name:"Asado de tira",               cat:"Carne vacuna",       prot:20, cal:320, custom:false},
+  {name:"Higado vacuno",               cat:"Carne vacuna",       prot:26, cal:135, custom:false},
+  {name:"Bife de chorizo cerdo",       cat:"Carne de cerdo",     prot:22, cal:180, custom:false},
+  {name:"Carne de cerdo magra",        cat:"Carne de cerdo",     prot:27, cal:242, custom:false},
+  {name:"Pollo pechuga s/piel",        cat:"Ave",                prot:31, cal:165, custom:false},
+  {name:"Pata muslo pollo s/piel",     cat:"Ave",                prot:20, cal:127, custom:false},
+  {name:"Pavo pechuga",                cat:"Ave",                prot:29, cal:135, custom:false},
+  {name:"Atun en lata al natural",     cat:"Pescado",            prot:30, cal:116, custom:false},
+  {name:"Salmon",                      cat:"Pescado",            prot:25, cal:208, custom:false},
+  {name:"Merluza",                     cat:"Pescado",            prot:17, cal:82,  custom:false},
+  {name:"Surubi / Dorado",             cat:"Pescado",            prot:20, cal:105, custom:false},
+  {name:"Langostinos crudos",          cat:"Marisco",            prot:24, cal:99,  custom:false},
+  {name:"Pulpo cocido",                cat:"Marisco",            prot:30, cal:164, custom:false},
+  {name:"Calamar crudo",               cat:"Marisco",            prot:18, cal:92,  custom:false},
+  {name:"Huevo entero",                cat:"Huevo",              prot:13, cal:143, custom:false},
+  {name:"Clara de huevo",              cat:"Huevo",              prot:11, cal:52,  custom:false},
+  {name:"Yema de huevo",               cat:"Huevo",              prot:16, cal:322, custom:false},
+  {name:"Queso parmesano",             cat:"Queso duro",         prot:36, cal:392, custom:false},
+  {name:"Queso danbo (Tybi)",          cat:"Queso semiduro",     prot:23, cal:350, custom:false},
+  {name:"Queso mozzarella",            cat:"Queso fresco",       prot:22, cal:280, custom:false},
+  {name:"Q. port salut La Serenisima", cat:"Queso semiduro",     prot:22, cal:300, custom:false},
+  {name:"Queso Finlandia clasico",     cat:"Queso untable",      prot:18, cal:287, custom:false},
+  {name:"Queso Finlandia light",       cat:"Queso untable",      prot:9,  cal:193, custom:false},
+  {name:"Casancrem clasico",           cat:"Queso crema",        prot:7,  cal:227, custom:false},
+  {name:"Casancrem light",             cat:"Queso crema",        prot:5,  cal:150, custom:false},
+  {name:"Ricota",                      cat:"Queso fresco",       prot:11, cal:140, custom:false},
+  {name:"Yogur griego natural",        cat:"Lacteo",             prot:10, cal:97,  custom:false},
+  {name:"Leche entera",                cat:"Lacteo",             prot:3,  cal:61,  custom:false},
+  {name:"Jamon cocido",                cat:"Fiambre",            prot:18, cal:107, custom:false},
+  {name:"Salame",                      cat:"Fiambre",            prot:22, cal:425, custom:false},
+  {name:"Mortadela",                   cat:"Fiambre",            prot:13, cal:311, custom:false},
+  {name:"Soja texturizada seca",       cat:"Legumbre",           prot:52, cal:336, custom:false},
+  {name:"Edamame (soja verde)",        cat:"Legumbre",           prot:11, cal:121, custom:false},
+  {name:"Lentejas cocidas",            cat:"Legumbre",           prot:9,  cal:116, custom:false},
+  {name:"Garbanzos cocidos",           cat:"Legumbre",           prot:9,  cal:164, custom:false},
+  {name:"Porotos negros cocidos",      cat:"Legumbre",           prot:9,  cal:132, custom:false},
+  {name:"Semillas de canamo",          cat:"Semilla",            prot:32, cal:553, custom:false},
+  {name:"Mani tostado",                cat:"Semilla/Fruto seco", prot:26, cal:585, custom:false},
+  {name:"Almendras",                   cat:"Semilla/Fruto seco", prot:21, cal:579, custom:false},
+  {name:"Semillas de chia",            cat:"Semilla",            prot:17, cal:490, custom:false},
+  {name:"Quinoa cocida",               cat:"Cereal",             prot:4,  cal:120, custom:false},
+  {name:"Proteina de suero (whey)",    cat:"Suplemento",         prot:80, cal:380, custom:false}
 ];
 
-foods.sort(function(a,b){ return b.prot - a.prot; });
+var STORAGE_KEY = 'proteinas_custom_foods';
+var editingId = null;
 
-var labels    = foods.map(function(f){ return f.name; });
-var protData  = foods.map(function(f){ return f.prot; });
-var calData   = foods.map(function(f){ return f.cal; });
+function loadCustomFoods() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e) { return []; }
+}
+function saveCustomFoods(arr) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch(e) {}
+}
+function getAllFoods() {
+  var custom = loadCustomFoods();
+  return builtinFoods.concat(custom);
+}
 
-var cont = document.getElementById('cc');
-var canvas = document.getElementById('myChart');
-canvas.width  = cont.offsetWidth;
-canvas.height = 460;
+// ---- PANEL AGREGAR ----
+function saveCustomFood() {
+  var name = document.getElementById('new-name').value.trim();
+  var cat  = document.getElementById('new-cat').value.trim() || 'Personalizado';
+  var prot = parseFloat(document.getElementById('new-prot').value);
+  var cal  = parseFloat(document.getElementById('new-cal').value);
+  if(!name){ alert('Ingresa un nombre'); return; }
+  if(isNaN(prot)||prot<0){ alert('Ingresa proteinas validas'); return; }
+  if(isNaN(cal)||cal<0){ alert('Ingresa calorias validas'); return; }
 
-new Chart(canvas.getContext('2d'), {
-  type:'line',
-  data:{
-    labels:labels,
-    datasets:[
-      {label:'Proteinas (g)',data:protData,borderColor:'#00e5b0',backgroundColor:'rgba(0,229,176,0.07)',borderWidth:2.5,pointBackgroundColor:'#00e5b0',pointRadius:4,pointHoverRadius:7,tension:0.3,fill:true,yAxisID:'yP'},
-      {label:'Calorias (kcal)',data:calData,borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,0.06)',borderWidth:2.5,pointBackgroundColor:'#ff6b35',pointRadius:4,pointHoverRadius:7,tension:0.3,fill:true,yAxisID:'yC'}
-    ]
-  },
-  options:{
-    responsive:true, maintainAspectRatio:false,
-    interaction:{mode:'index',intersect:false},
-    plugins:{
-      legend:{labels:{color:'#9ca3af',font:{family:'DM Mono',size:11},boxWidth:14,padding:20}},
-      tooltip:{backgroundColor:'#1a1d28',borderColor:'#1e2230',borderWidth:1,titleColor:'#fff',bodyColor:'#9ca3af',padding:12,
-        titleFont:{family:'Syne',size:13},bodyFont:{family:'DM Mono',size:11},
-        callbacks:{label:function(ctx){
-          if(ctx.datasetIndex===0) return '  Proteinas: '+ctx.parsed.y+'g';
-          return '  Calorias: '+ctx.parsed.y+' kcal';
-        }}
-      }
-    },
-    scales:{
-      x:{ticks:{color:'#4b5563',font:{family:'DM Mono',size:9},maxRotation:55,minRotation:45,autoSkip:false},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'#1e2230'}},
-      yP:{type:'linear',position:'left',min:0,
-        title:{display:true,text:'Proteinas (g)',color:'#00e5b0',font:{family:'DM Mono',size:10}},
-        ticks:{color:'#00e5b0',font:{family:'DM Mono',size:10},callback:function(v){return v+'g';}},
-        grid:{color:'rgba(0,229,176,0.05)'},border:{color:'#00e5b033'}},
-      yC:{type:'linear',position:'right',min:0,
-        title:{display:true,text:'Calorias (kcal)',color:'#ff6b35',font:{family:'DM Mono',size:10}},
-        ticks:{color:'#ff6b35',font:{family:'DM Mono',size:10},callback:function(v){return v+' kcal';}},
-        grid:{drawOnChartArea:false},border:{color:'#ff6b3533'}}
+  var customs = loadCustomFoods();
+  if(editingId!==null) {
+    for(var i=0;i<customs.length;i++){
+      if(customs[i].id===editingId){ customs[i]={id:editingId,name:name,cat:cat,prot:prot,cal:cal,custom:true}; break; }
     }
+    editingId=null;
+    document.getElementById('btn-save-food').textContent='Guardar';
+    document.getElementById('btn-cancel-edit').style.display='none';
+  } else {
+    customs.push({id:Date.now(), name:name, cat:cat, prot:prot, cal:cal, custom:true});
   }
+  saveCustomFoods(customs);
+  document.getElementById('new-name').value='';
+  document.getElementById('new-cat').value='';
+  document.getElementById('new-prot').value='';
+  document.getElementById('new-cal').value='';
+  renderCustomList();
+  sortBy(currentSort);
+}
+
+function editCustomFood(id) {
+  var customs = loadCustomFoods();
+  var f = customs.filter(function(x){return x.id===id;})[0];
+  if(!f) return;
+  editingId = id;
+  document.getElementById('new-name').value = f.name;
+  document.getElementById('new-cat').value  = f.cat;
+  document.getElementById('new-prot').value = f.prot;
+  document.getElementById('new-cal').value  = f.cal;
+  document.getElementById('btn-save-food').textContent = 'Actualizar';
+  document.getElementById('btn-cancel-edit').style.display = 'inline-block';
+  document.getElementById('new-name').focus();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function cancelEdit() {
+  editingId = null;
+  document.getElementById('new-name').value='';
+  document.getElementById('new-cat').value='';
+  document.getElementById('new-prot').value='';
+  document.getElementById('new-cal').value='';
+  document.getElementById('btn-save-food').textContent='Guardar';
+  document.getElementById('btn-cancel-edit').style.display='none';
+}
+
+function deleteCustomFood(id) {
+  var customs = loadCustomFoods();
+  customs = customs.filter(function(x){return x.id!==id;});
+  saveCustomFoods(customs);
+  renderCustomList();
+  sortBy(currentSort);
+}
+
+function renderCustomList() {
+  var customs = loadCustomFoods();
+  var container = document.getElementById('custom-food-list');
+  container.innerHTML = '';
+  if(customs.length===0){
+    container.innerHTML='<span class="no-custom">Todavia no agregaste alimentos. Los que agregues apareceran aqui y en todos los graficos.</span>';
+    return;
+  }
+  customs.forEach(function(f){
+    var div = document.createElement('div');
+    div.className = 'custom-tag';
+    div.innerHTML =
+      '<span class="tag-name">'+f.name+'</span>'+
+      '<span class="tag-meta">'+f.prot+'g prot / '+f.cal+' kcal / '+f.cat+'</span>'+
+      '<button class="tag-edit" onclick="editCustomFood('+f.id+')">&#x270E; Editar</button>'+
+      '<button class="tag-del"  onclick="deleteCustomFood('+f.id+')">&#x2715;</button>';
+    container.appendChild(div);
+  });
+}
+
+// ---- CALCULADORA ----
+var calcItems = [];
+var selectedFood = null;
+var acIdx = -1;
+
+function norm(s) {
+  return (s||'').toLowerCase()
+    .replace(/[aáàä]/g,'a').replace(/[eéèë]/g,'e')
+    .replace(/[iíìï]/g,'i').replace(/[oóòö]/g,'o')
+    .replace(/[uúùü]/g,'u');
+}
+
+var calcInput = document.getElementById('calc-input');
+var acList = document.getElementById('ac-list');
+
+calcInput.addEventListener('input', function(){
+  var q = norm(calcInput.value.trim());
+  selectedFood = null; acIdx = -1;
+  if(q.length<1){ acList.className='autocomplete-list'; return; }
+  var all = getAllFoods();
+  var matches = all.filter(function(f){ return norm(f.name).indexOf(q)>=0; });
+  if(matches.length===0){ acList.className='autocomplete-list'; return; }
+  acList.innerHTML='';
+  matches.slice(0,12).forEach(function(f){
+    var div=document.createElement('div');
+    div.className='ac-item';
+    div.innerHTML='<span class="ac-name">'+f.name+(f.custom?'<span class="ac-custom-dot" title="Personalizado"></span>':'')+'</span><span class="ac-meta">'+f.prot+'g prot / '+f.cal+' kcal</span>';
+    div.addEventListener('mousedown',function(e){e.preventDefault();selectFood(f);});
+    acList.appendChild(div);
+  });
+  acList.className='autocomplete-list open';
 });
 
-var tbody = document.getElementById('tb');
-var maxP = Math.max.apply(null,protData);
-var maxC = Math.max.apply(null,calData);
-
-foods.forEach(function(f,i){
-  var pw = Math.round((f.prot/maxP)*72);
-  var cw = Math.round((f.cal/maxC)*72);
-  var ratio = (f.cal/f.prot).toFixed(1);
-  var tr = document.createElement('tr');
-  tr.innerHTML =
-    '<td class="rank">'+String(i+1).padStart(2,'0')+'</td>'+
-    '<td><div class="fn">'+f.name+'</div><div class="fc">'+f.cat+'</div></td>'+
-    '<td class="nr gv">'+f.prot+'g <span class="bb"><span class="bf" style="width:'+pw+'px;background:var(--gc)"></span></span></td>'+
-    '<td class="nr cv">'+f.cal+' <span class="bb"><span class="bf" style="width:'+cw+'px;background:var(--cc)"></span></span></td>'+
-    '<td class="nr" style="color:var(--muted)">'+ratio+'</td>';
-  tbody.appendChild(tr);
+calcInput.addEventListener('keydown',function(e){
+  var items=acList.querySelectorAll('.ac-item');
+  if(e.key==='ArrowDown'){acIdx=Math.min(acIdx+1,items.length-1);hlAC(items);e.preventDefault();}
+  else if(e.key==='ArrowUp'){acIdx=Math.max(acIdx-1,0);hlAC(items);e.preventDefault();}
+  else if(e.key==='Enter'){
+    if(acIdx>=0&&items[acIdx]){ items[acIdx].dispatchEvent(new MouseEvent('mousedown')); }
+    else { addCalcItem(); }
+    e.preventDefault();
+  } else if(e.key==='Escape'){ acList.className='autocomplete-list'; }
 });
+calcInput.addEventListener('blur',function(){setTimeout(function(){acList.className='autocomplete-list';},150);});
+
+function hlAC(items){ items.forEach(function(it,i){it.className=i===acIdx?'ac-item selected':'ac-item';}); }
+
+function selectFood(f){ selectedFood=f; calcInput.value=f.name; acList.className='autocomplete-list'; document.getElementById('calc-grams').focus(); }
+
+function addCalcItem(){
+  if(!selectedFood){calcInput.style.borderColor='#ff4444';setTimeout(function(){calcInput.style.borderColor='';},1000);return;}
+  var grams=parseFloat(document.getElementById('calc-grams').value);
+  if(!grams||grams<=0){document.getElementById('calc-grams').style.borderColor='#ff4444';setTimeout(function(){document.getElementById('calc-grams').style.borderColor='';},1000);return;}
+  var prot=Math.round((selectedFood.prot/100)*grams*10)/10;
+  var cal=Math.round((selectedFood.cal/100)*grams);
+  calcItems.push({name:selectedFood.name,cat:selectedFood.cat,grams:grams,prot:prot,cal:cal,id:Date.now()});
+  calcInput.value=''; document.getElementById('calc-grams').value=''; selectedFood=null;
+  renderCalc(); calcInput.focus();
+}
+
+function removeCalcItem(id){ calcItems=calcItems.filter(function(it){return it.id!==id;}); renderCalc(); }
+function clearCalc(){ calcItems=[]; renderCalc(); }
+
+function renderCalc(){
+  var list=document.getElementById('items-list');
+  var bar=document.getElementById('totals-bar');
+  list.innerHTML='';
+  if(calcItems.length===0){bar.style.display='none';return;}
+  var tp=0,tc=0;
+  calcItems.forEach(function(it){
+    tp+=it.prot; tc+=it.cal;
+    var div=document.createElement('div'); div.className='item-row';
+    div.innerHTML='<div class="item-name">'+it.name+'<small>'+it.grams+'g &mdash; '+it.cat+'</small></div>'+
+      '<div class="item-macros"><span class="item-prot">'+it.prot+'g prot</span><span class="item-cal">'+it.cal+' kcal</span></div>'+
+      '<button class="item-delete" onclick="removeCalcItem('+it.id+')">&#x2715;</button>';
+    list.appendChild(div);
+  });
+  document.getElementById('total-prot').textContent=Math.round(tp*10)/10+'g';
+  document.getElementById('total-cal').textContent=tc+' kcal';
+  document.getElementById('total-items').textContent=calcItems.length+(calcItems.length===1?' item':' items');
+  bar.style.display='flex';
+}
+
+// ---- GRAFICOS Y TABLAS ----
+var currentSort='prot';
+var chart1=null, chart2=null;
+
+function makeChart(canvasId, foods){
+  var canvas=document.getElementById(canvasId);
+  var w=Math.max(foods.length*56,400); canvas.width=w; canvas.height=400;
+  var ptColors=foods.map(function(f){return f.custom?'#7c6fff':'#00e5b0';});
+  return new Chart(canvas.getContext('2d'),{
+    type:'line',
+    data:{
+      labels:foods.map(function(f){return f.name;}),
+      datasets:[
+        {label:'Proteinas (g)',data:foods.map(function(f){return f.prot;}),borderColor:'#00e5b0',backgroundColor:'rgba(0,229,176,0.07)',borderWidth:2.5,pointBackgroundColor:ptColors,pointRadius:5,pointHoverRadius:8,tension:0.3,fill:true,yAxisID:'yP'},
+        {label:'Calorias (kcal)',data:foods.map(function(f){return f.cal;}),borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,0.06)',borderWidth:2.5,pointBackgroundColor:'#ff6b35',pointRadius:5,pointHoverRadius:8,tension:0.3,fill:true,yAxisID:'yC'}
+      ]
+    },
+    options:{
+      responsive:false,animation:{duration:400},interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{backgroundColor:'#1a1d28',borderColor:'#1e2230',borderWidth:1,titleColor:'#fff',bodyColor:'#9ca3af',padding:12,
+          titleFont:{family:'Syne',size:13},bodyFont:{family:'DM Mono',size:11},
+          callbacks:{label:function(ctx){return ctx.datasetIndex===0?'  Proteinas: '+ctx.parsed.y+'g':'  Calorias: '+ctx.parsed.y+' kcal';}}
+        }
+      },
+      scales:{
+        x:{ticks:{color:'#c0c8d8',font:{family:'Arial',size:11},maxRotation:50,minRotation:40,autoSkip:false},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'#1e2230'}},
+        yP:{type:'linear',position:'left',min:0,title:{display:true,text:'Proteinas (g)',color:'#00e5b0',font:{family:'DM Mono',size:10}},ticks:{color:'#00e5b0',font:{family:'DM Mono',size:10},callback:function(v){return v+'g';}},grid:{color:'rgba(0,229,176,0.05)'},border:{color:'#00e5b033'}},
+        yC:{type:'linear',position:'right',min:0,title:{display:true,text:'Calorias (kcal)',color:'#ff6b35',font:{family:'DM Mono',size:10}},ticks:{color:'#ff6b35',font:{family:'DM Mono',size:10},callback:function(v){return v+' kcal';}},grid:{drawOnChartArea:false},border:{color:'#ff6b3533'}}
+      }
+    }
+  });
+}
+
+function makeTable(tbodyId,foods){
+  var maxP=Math.max.apply(null,foods.map(function(f){return f.prot;}));
+  var maxC=Math.max.apply(null,foods.map(function(f){return f.cal;}));
+  var tbody=document.getElementById(tbodyId); tbody.innerHTML='';
+  foods.forEach(function(f,i){
+    var pw=Math.round((f.prot/maxP)*72),cw=Math.round((f.cal/maxC)*72);
+    var tr=document.createElement('tr');
+    if(f.custom) tr.className='custom-row';
+    tr.innerHTML='<td class="rank">'+String(i+1).padStart(2,'0')+'</td>'+
+      '<td><div class="fn">'+f.name+(f.custom?' <span style="font-size:0.6rem;color:var(--accent);margin-left:4px">&#x2605; mio</span>':'')+'</div><div class="fc">'+f.cat+'</div></td>'+
+      '<td class="nr gv">'+f.prot+'g <span class="bb"><span class="bf" style="width:'+pw+'px;background:'+(f.custom?'var(--accent)':'var(--gc)')+'"></span></span></td>'+
+      '<td class="nr cv">'+f.cal+' <span class="bb"><span class="bf" style="width:'+cw+'px;background:var(--cc)"></span></span></td>'+
+      '<td class="nr" style="color:var(--muted)">'+(f.cal/f.prot).toFixed(1)+'</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function sortBy(key){
+  currentSort=key;
+  var foods=getAllFoods().slice();
+  if(key==='prot')    foods.sort(function(a,b){return b.prot-a.prot;});
+  if(key==='cal')     foods.sort(function(a,b){return b.cal-a.cal;});
+  if(key==='cal_asc') foods.sort(function(a,b){return a.cal-b.cal;});
+  if(key==='ratio')   foods.sort(function(a,b){return (a.cal/a.prot)-(b.cal/b.prot);});
+  if(key==='name')    foods.sort(function(a,b){return a.name.localeCompare(b.name);});
+  var btns=document.querySelectorAll('.sort-btn');
+  btns.forEach(function(b){b.className='sort-btn';});
+  var idx=['prot','cal','cal_asc','ratio','name'].indexOf(key);
+  if(idx>=0){ var cls=(key==='prot')?'ap':(key==='name')?'an':'ac'; btns[idx].className='sort-btn '+cls; }
+  var high=foods.filter(function(f){return f.prot>=20;});
+  var low=foods.filter(function(f){return f.prot<20;});
+  document.getElementById('count-high').textContent='('+high.length+' alimentos)';
+  document.getElementById('count-low').textContent='('+low.length+' alimentos)';
+  if(chart1) chart1.destroy();
+  if(chart2) chart2.destroy();
+  chart1=makeChart('chart1',high);
+  chart2=makeChart('chart2',low);
+  makeTable('tb1',high);
+  makeTable('tb2',low);
+}
+
+
+// ---- EXPORT / IMPORT ----
+function exportFoods() {
+  var customs = loadCustomFoods();
+  if(customs.length===0){ alert('No tenes alimentos personalizados para exportar.'); return; }
+  var json = JSON.stringify(customs, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'mis_alimentos_proteinas.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importFoods(event) {
+  var file = event.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var imported = JSON.parse(e.target.result);
+      if(!Array.isArray(imported)) throw new Error('formato invalido');
+      var valid = imported.filter(function(f){ return f.name && !isNaN(f.prot) && !isNaN(f.cal); });
+      if(valid.length===0) throw new Error('no se encontraron alimentos validos');
+      var existing = loadCustomFoods();
+      var existingNames = existing.map(function(f){ return f.name.toLowerCase(); });
+      var added = 0;
+      valid.forEach(function(f){
+        if(existingNames.indexOf(f.name.toLowerCase())===-1){
+          existing.push({id: Date.now()+Math.random(), name:f.name, cat:f.cat||'Personalizado', prot:parseFloat(f.prot), cal:parseFloat(f.cal), custom:true});
+          added++;
+        }
+      });
+      saveCustomFoods(existing);
+      renderCustomList();
+      sortBy(currentSort);
+      var msg = document.getElementById('import-msg');
+      msg.textContent = added + ' alimento(s) importado(s) correctamente';
+      msg.style.display = 'inline';
+      setTimeout(function(){ msg.style.display='none'; }, 4000);
+    } catch(err) {
+      alert('Error al importar: ' + err.message);
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// Init
+renderCustomList();
+sortBy('prot');
 </script>
 </body>
 </html>
