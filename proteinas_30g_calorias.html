@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuanto comer para 30g de proteina</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+:root {
+  --bg:#0d0f14; --surface:#151820; --border:#1e2230;
+  --gc:#00e5b0; --cc:#ff4444; --text:#e8eaf0; --muted:#6b7280;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:'DM Mono',monospace; padding:36px 20px; }
+header { text-align:center; margin-bottom:12px; }
+header h1 { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(1.5rem,3.5vw,2.4rem); color:#fff; line-height:1.2; }
+header h1 .g { color:var(--gc); }
+.sub { text-align:center; color:#8b9ab0; font-size:0.78rem; margin:10px auto 28px; max-width:600px; line-height:1.6; }
+.legend { display:flex; justify-content:center; gap:28px; margin-bottom:20px; flex-wrap:wrap; }
+.li { display:flex; align-items:center; gap:8px; font-size:0.72rem; text-transform:uppercase; letter-spacing:.5px; }
+.dot { width:12px; height:12px; border-radius:2px; }
+.chart-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:28px 12px 20px; margin-bottom:40px; overflow-x:auto; }
+#cc { position:relative; min-width:1100px; height:460px; }
+.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+table { width:100%; border-collapse:collapse; font-size:0.74rem; }
+thead th { background:#1a1d28; padding:13px 14px; font-family:'Syne',sans-serif; font-size:0.67rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
+thead th.r { text-align:right; }
+tbody tr { border-bottom:1px solid var(--border); }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:#1c1f2e; }
+tbody td { padding:10px 14px; vertical-align:middle; }
+.rank { color:var(--muted); font-size:0.63rem; font-family:'Syne',sans-serif; }
+.fn { font-weight:500; color:#fff; font-size:0.78rem; }
+.fc { font-size:0.63rem; color:var(--muted); margin-top:2px; }
+.nr { text-align:right; font-variant-numeric:tabular-nums; }
+.gv { color:var(--gc); font-weight:500; }
+.cv { color:var(--cc); font-weight:500; }
+.bb { background:#1e2230; border-radius:3px; height:5px; width:72px; display:inline-block; overflow:hidden; vertical-align:middle; margin-left:6px; }
+.bf { height:100%; border-radius:3px; }
+.badge { display:inline-block; font-size:0.58rem; padding:2px 5px; border-radius:3px; margin-left:5px; font-family:'Syne',sans-serif; letter-spacing:.5px; text-transform:uppercase; vertical-align:middle; }
+.bb1 { background:rgba(0,229,176,.15); color:var(--gc); }
+.bb2 { background:rgba(255,68,68,.15); color:var(--cc); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Menor calorias para llegar a <span class="g">30g de proteina</span></h1>
+</header>
+<p class="sub">Ordenado de menor a mayor calorias. Verde = gramos a comer (eje izq). Rojo = calorias de esa porcion (eje der).</p>
+<div class="legend">
+  <div class="li"><div class="dot" style="background:var(--gc)"></div>Gramos a comer (eje izq.)</div>
+  <div class="li"><div class="dot" style="background:var(--cc)"></div>Calorias de la porcion (eje der.)</div>
+</div>
+<div class="chart-wrap"><div id="cc"><canvas id="myChart"></canvas></div></div>
+<div class="table-wrap"><table><thead><tr>
+  <th>#</th><th>Alimento</th><th class="r">Gramos a comer</th><th class="r">Calorias (porcion)</th><th class="r">Prot/100g</th>
+</tr></thead><tbody id="tb"></tbody></table></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+var foods = [
+  {name:"Bife de lomo (vaca)",         cat:"Carne vacuna",       prot:21, cal:148},
+  {name:"Bife de cuadril (magro)",     cat:"Carne vacuna",       prot:21, cal:158},
+  {name:"Bife de chorizo (vaca)",      cat:"Carne vacuna",       prot:24, cal:215},
+  {name:"Carne vacuna magra",          cat:"Carne vacuna",       prot:26, cal:215},
+  {name:"Asado de tira",               cat:"Carne vacuna",       prot:20, cal:320},
+  {name:"Higado vacuno",               cat:"Carne vacuna",       prot:26, cal:135},
+  {name:"Bife de chorizo cerdo",       cat:"Carne de cerdo",     prot:22, cal:180},
+  {name:"Carne de cerdo magra",        cat:"Carne de cerdo",     prot:27, cal:242},
+  {name:"Pollo pechuga s/piel",        cat:"Ave",                prot:31, cal:165},
+  {name:"Pata muslo pollo s/piel",     cat:"Ave",                prot:20, cal:127},
+  {name:"Pavo pechuga",                cat:"Ave",                prot:29, cal:135},
+  {name:"Atun en lata al natural",     cat:"Pescado",            prot:30, cal:116},
+  {name:"Salmon",                      cat:"Pescado",            prot:25, cal:208},
+  {name:"Merluza",                     cat:"Pescado",            prot:17, cal:82},
+  {name:"Surubi / Dorado",             cat:"Pescado",            prot:20, cal:105},
+  {name:"Langostinos crudos",          cat:"Marisco",            prot:24, cal:99},
+  {name:"Pulpo cocido",                cat:"Marisco",            prot:30, cal:164},
+  {name:"Calamar crudo",               cat:"Marisco",            prot:18, cal:92},
+  {name:"Huevo entero",                cat:"Huevo",              prot:13, cal:143},
+  {name:"Clara de huevo",              cat:"Huevo",              prot:11, cal:52},
+  {name:"Yema de huevo",               cat:"Huevo",              prot:16, cal:322},
+  {name:"Queso parmesano",             cat:"Queso duro",         prot:36, cal:392},
+  {name:"Queso danbo (Tybi)",          cat:"Queso semiduro",     prot:23, cal:350},
+  {name:"Queso mozzarella",            cat:"Queso fresco",       prot:22, cal:280},
+  {name:"Q. port salut La Serenisima", cat:"Queso semiduro",     prot:22, cal:300},
+  {name:"Queso Finlandia clasico",     cat:"Queso untable",      prot:18, cal:287},
+  {name:"Queso Finlandia light",       cat:"Queso untable",      prot:9,  cal:193},
+  {name:"Casancrem clasico",           cat:"Queso crema",        prot:7,  cal:227},
+  {name:"Casancrem light",             cat:"Queso crema",        prot:5,  cal:150},
+  {name:"Ricota",                      cat:"Queso fresco",       prot:11, cal:140},
+  {name:"Yogur griego natural",        cat:"Lacteo",             prot:10, cal:97},
+  {name:"Leche entera",                cat:"Lacteo",             prot:3,  cal:61},
+  {name:"Jamon cocido",                cat:"Fiambre",            prot:18, cal:107},
+  {name:"Salame",                      cat:"Fiambre",            prot:22, cal:425},
+  {name:"Mortadela",                   cat:"Fiambre",            prot:13, cal:311},
+  {name:"Soja texturizada seca",       cat:"Legumbre",           prot:52, cal:336},
+  {name:"Edamame (soja verde)",        cat:"Legumbre",           prot:11, cal:121},
+  {name:"Lentejas cocidas",            cat:"Legumbre",           prot:9,  cal:116},
+  {name:"Garbanzos cocidos",           cat:"Legumbre",           prot:9,  cal:164},
+  {name:"Porotos negros cocidos",      cat:"Legumbre",           prot:9,  cal:132},
+  {name:"Semillas de canamo",          cat:"Semilla",            prot:32, cal:553},
+  {name:"Mani tostado",                cat:"Semilla/Fruto seco", prot:26, cal:585},
+  {name:"Almendras",                   cat:"Semilla/Fruto seco", prot:21, cal:579},
+  {name:"Semillas de chia",            cat:"Semilla",            prot:17, cal:490},
+  {name:"Quinoa cocida",               cat:"Cereal",             prot:4,  cal:120},
+  {name:"Proteina de suero (whey)",    cat:"Suplemento",         prot:80, cal:380}
+];
+
+var TARGET = 30;
+foods.forEach(function(f){
+  f.gramsNeeded = Math.round((TARGET/f.prot)*100);
+  f.calsForTarget = Math.round((f.cal/100)*f.gramsNeeded);
+});
+foods.sort(function(a,b){ return a.calsForTarget - b.calsForTarget; });
+
+var labels    = foods.map(function(f){ return f.name; });
+var gramsData = foods.map(function(f){ return f.gramsNeeded; });
+var calsData  = foods.map(function(f){ return f.calsForTarget; });
+var refData   = foods.map(function(){ return TARGET; });
+
+var cont = document.getElementById('cc');
+var canvas = document.getElementById('myChart');
+canvas.width = cont.offsetWidth;
+canvas.height = 460;
+
+new Chart(canvas.getContext('2d'), {
+  type:'line',
+  data:{
+    labels:labels,
+    datasets:[
+      {label:'Gramos a comer',data:gramsData,borderColor:'#00e5b0',backgroundColor:'rgba(0,229,176,0.07)',borderWidth:2.5,pointBackgroundColor:'#00e5b0',pointRadius:4,pointHoverRadius:7,tension:0.3,fill:true,yAxisID:'yG'},
+      {label:'Calorias de esa porcion',data:calsData,borderColor:'#ff4444',backgroundColor:'rgba(255,68,68,0.06)',borderWidth:2.5,pointBackgroundColor:'#ff4444',pointRadius:4,pointHoverRadius:7,tension:0.3,fill:true,yAxisID:'yC'},
+      {label:'30g proteina referencia',data:refData,borderColor:'rgba(255,255,255,0.3)',borderWidth:2,borderDash:[6,4],pointRadius:0,tension:0,fill:false,yAxisID:'yG'}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{labels:{color:'#9ca3af',font:{family:'DM Mono',size:11},boxWidth:14,padding:20}},
+      tooltip:{backgroundColor:'#1a1d28',borderColor:'#1e2230',borderWidth:1,titleColor:'#fff',bodyColor:'#9ca3af',padding:12,
+        titleFont:{family:'Syne',size:13},bodyFont:{family:'DM Mono',size:11},
+        callbacks:{label:function(ctx){
+          if(ctx.datasetIndex===0) return '  Gramos a comer: '+ctx.parsed.y+'g';
+          if(ctx.datasetIndex===1) return '  Calorias: '+ctx.parsed.y+' kcal';
+          return '  Proteina objetivo: '+ctx.parsed.y+'g';
+        }}
+      }
+    },
+    scales:{
+      x:{ticks:{color:'#4b5563',font:{family:'DM Mono',size:9},maxRotation:55,minRotation:45,autoSkip:false},grid:{color:'rgba(255,255,255,0.03)'},border:{color:'#1e2230'}},
+      yG:{type:'linear',position:'left',min:0,
+        title:{display:true,text:'Gramos a comer',color:'#00e5b0',font:{family:'DM Mono',size:10}},
+        ticks:{color:'#00e5b0',font:{family:'DM Mono',size:10},callback:function(v){return v+'g';}},
+        grid:{color:'rgba(0,229,176,0.05)'},border:{color:'#00e5b033'}},
+      yC:{type:'linear',position:'right',min:0,
+        title:{display:true,text:'Calorias (kcal)',color:'#ff4444',font:{family:'DM Mono',size:10}},
+        ticks:{color:'#ff4444',font:{family:'DM Mono',size:10},callback:function(v){return v+' kcal';}},
+        grid:{drawOnChartArea:false},border:{color:'#ff444433'}}
+    }
+  }
+});
+
+var tbody = document.getElementById('tb');
+var maxG = Math.max.apply(null,gramsData);
+var maxC = Math.max.apply(null,calsData);
+foods.forEach(function(f,i){
+  var gw = Math.round((f.gramsNeeded/maxG)*72);
+  var cw = Math.round((f.calsForTarget/maxC)*72);
+  var badge = '';
+  if(i<3) badge = '<span class="badge bb1">+ eficiente</span>';
+  if(i>=foods.length-3) badge = '<span class="badge bb2">+ cantidad</span>';
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td class="rank">'+String(i+1).padStart(2,'0')+'</td>'+
+    '<td><div class="fn">'+f.name+badge+'</div><div class="fc">'+f.cat+'</div></td>'+
+    '<td class="nr gv">'+f.gramsNeeded+'g <span class="bb"><span class="bf" style="width:'+gw+'px;background:var(--gc)"></span></span></td>'+
+    '<td class="nr cv">'+f.calsForTarget+' kcal <span class="bb"><span class="bf" style="width:'+cw+'px;background:var(--cc)"></span></span></td>'+
+    '<td class="nr" style="color:var(--muted)">'+f.prot+'g</td>';
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>
